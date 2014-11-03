@@ -4,13 +4,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "../hospital.h"
 #include "../lib/common.h"
 #include "../lib/NSignals.h"
-#include "../lib/NMessageQueue.h"
-#include "../lib/NSharedMemory.h"
 #include "../lib/NSemaphore.h"
-#include "../hospital.h"
+#include "../lib/NSharedMemory.h"
+#include "../lib/NMessageQueue.h"
 
+// Handlers
 void handler_sigint_exit(int sig, siginfo_t* siginfo_handler, int* val);
 void handler_sigusr1_managePatient(int sig, siginfo_t* siginfo_handler, int* val);
 
@@ -150,7 +152,7 @@ void handler_sigusr1_managePatient(int sig, siginfo_t* siginfo_handler, int* val
      * ---------------------------------------------------------------------- */
 
     if (sendMessage(&mq_traitement, message, priority) == -1)
-        REDPRINTF("Message sent failed !\n");
+        REDPRINTF("Message not sent !\n");
     else
         GREENPRINTF("Message sent !\n");
 }

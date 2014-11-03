@@ -4,20 +4,19 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "../hospital.h"
 #include "../lib/common.h"
+#include "../lib/NSignals.h"
 #include "../lib/NSemaphore.h"
 #include "../lib/NSharedMemory.h"
-#include "../lib/NSignals.h"
-#include "../lib/NMessageQueue.h"
-#include "../hospital.h"
 
+// Handler
 void handler_sigint_exit(int sig, siginfo_t* siginfo_handler, int* val);
 
+// Functions
 void DisplayMenu(void);
 void generateSISNumbers(void);
 void encodeSISNumbers(void);
-
-int c;
 
 pid_t pid_tri;
 
@@ -72,8 +71,6 @@ int main(void)
 
     GREENPRINTF("Mutex closed\n");
 
-
-
     // Loop for receiving signals
     while(1)
         DisplayMenu();
@@ -87,7 +84,7 @@ void handler_sigint_exit(int sig, siginfo_t* siginfo_handler, int* val)
     UNUSED(siginfo_handler);
     UNUSED(val);
 
-    GREENPRINTF("\nFree resources and close ...\n");
+    GREENPRINTF("\nFree resources and close\n");
     exit(EXIT_SUCCESS);
 }
 
