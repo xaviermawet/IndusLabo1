@@ -46,12 +46,7 @@ int main(void)
 
     // Loop for receiving signals
     while(1)
-    {
         pause();
-
-        GREENPRINTF("Nouvel abonnement au signal ...\n");
-        setSignalHandler(SIGUSR1, handler_sigusr1_readMessage);
-    }
 }
 
 void handler_sigint_exit(int sig, siginfo_t* siginfo_handler, int* val)
@@ -79,19 +74,21 @@ void handler_sigusr1_readMessage(int sig, siginfo_t* siginfo_handler, int* val)
     UNUSED(siginfo_handler);
     UNUSED(val);
 
-    // Read current message
-    if (receiveMessage(&mq_traitement, message, MQ_MAX_MESSAGE_LENGTH, &priority) == -1)
-        REDPRINTF("Error when receiving message ...\n");
+    // Request a further notification
+    if (getMessageQueueNotificationBySignal(&mq_traitement, SIGUSR1) == -1)
+        REDPRINTF("Register for notification failed\n");
+    else
+        GREENPRINTF("Register for notification (SIGUSR1) OK\n");
 
-    printf("Message received with priority %d : %s\n", priority, message);
+    // Set message queue in NON BLOCKING mode
+    setMessageQueueBlockingMode(&mq_traitement, FALSE);
 
+    // Emptying all unread messages from the queue
+    while(receiveMessage(&mq_traitement, message, MQ_MAX_MESSAGE_LENGTH, &priority) > 0)
+        printf("Message received with priority %d : %s\n", priority, message);
 
-    // TODO : mettre la fille de message en non bloquant
-    // TODO : la vider tant qu'il y a des messages
-    // TODO : remettre la file en bloquant
-    // TODO : faire une nouvelle demande de notification
-
-    // TODO : vider le char[] message comme dans la lib pour vider le nom de je ne sais plus quoi ^^
+    // Set message queue in BLOCKING mode
+    setMessageQueueBlockingMode(&mq_traitement, TRUE);
 }
 
 

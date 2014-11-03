@@ -145,15 +145,13 @@ void handler_sigusr1_managePatient(int sig, siginfo_t* siginfo_handler, int* val
     sprintf(message, "Patient SIS = %d : %s", SISNumber, diagnosis[priority]);
     printf("%s - Priority %d\n", message, priority);
 
-    // NOTE : Mettre un temps de pause pour le temps de traitement :o ?
-
     /* ---------------------------------------------------------------------- *
      *                              SEND MESSAGE                              *
      * ---------------------------------------------------------------------- */
 
     if (sendMessage(&mq_traitement, message, priority) == -1)
-        exit(EXIT_FAILURE);
-
-    GREENPRINTF("Message sent !\n");
+        REDPRINTF("Message sent failed !\n");
+    else
+        GREENPRINTF("Message sent !\n");
 }
 

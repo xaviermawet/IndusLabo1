@@ -137,7 +137,7 @@ void generateSISNumbers(void)
     for(i = 0; i < num_patients; i++)
     {
         SISNumbers[i] = getRandomNumber(1, 10000);
-        printf("Patient %d : SIS numbers %d\n", i, SISNumbers[i]);
+        printf("Patient %d : SIS numbers %d\n", i + 1, SISNumbers[i]);
     }
 
     printf("Press ENTER to send all SIS numbers (patients) to the process Tri");
@@ -150,6 +150,8 @@ void generateSISNumbers(void)
     }
 
     free(SISNumbers);
+
+    GREENPRINTF("All SIS numbers sent\n");
 }
 
 void encodeSISNumbers(void)
@@ -169,7 +171,7 @@ void encodeSISNumbers(void)
 
     for(i = 0; i < num_patients; i++)
     {
-        printf("Patient %d : SIS numbers : ", i);
+        printf("Patient %d : SIS numbers : ", i + 1);
         SISNumbers[i] = getNumber();
     }
 
@@ -183,4 +185,6 @@ void encodeSISNumbers(void)
     }
 
     free(SISNumbers);
+
+    GREENPRINTF("All SIS numbers sent\n");
 }
