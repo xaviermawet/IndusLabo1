@@ -10,6 +10,7 @@
 #include <sys/stat.h>   /* For mode constants */
 #include <mqueue.h>
 #include <stdarg.h>
+#include "common.h"
 
 #define MQ_NAME_LENGTH 80          // May contain the whole path to the file
 #define MQ_MODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH) // 0644
@@ -43,6 +44,8 @@ int receiveMessage(const MessageQueue* messageQueue,
                    char* msg,
                    size_t msg_max_len,
                    unsigned int* msg_priority);
+
+int setMessageQueueBlockingMode(MessageQueue* messageQueue, bool activate);
 
 int getMessageQueueNotificationBySignal(const MessageQueue* messageQueue,
                                         int signal);

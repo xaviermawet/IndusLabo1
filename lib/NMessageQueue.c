@@ -140,29 +140,58 @@ int receiveMessage(const MessageQueue* messageQueue,
 
     msg_len = mq_receive(messageQueue->mq_des, msg, msg_max_len, msg_priority);
 
-    if (msg_len < 0)
+//    if (msg_len < 0)
+//    {
+//        perror("\n\rmq_receive failed !!!\n");
+
+//        switch(errno)
+//        {
+//            case EAGAIN:
+//                perror("The queue was empty, and the O_NONBLOCK flag was set for the message queue description referred to by mqdes.\n");
+//                break;
+//            case EBADF:
+//                perror("The descriptor specified in mqdes was invalid.\n");
+//                break;
+//            case EINTR:
+//                perror("The call was interrupted by a signal handler.\n");
+//                break;
+//            case EINVAL:
+//                perror("The call would have blocked, and abs_timeout was invalid, either because tv_sec was less than zero, or because tv_nsec was less than zero or greater than 1000 million.\n");
+//                break;
+//            case EMSGSIZE:
+//                perror("msg_len was less than the mq_msgsize attribute of the message queue.\n");
+//                break;
+//            case ETIMEDOUT:
+//                perror("The call timed out before a message could be transferred.\n");
+//                break;
+//            default :
+//                perror("Unknown error\n");
+//                break;
+//        }
+
+//        return -1;
+//    }
+
+    msg[msg_max_len -1] = '\0';
+
+    return (int)msg_len;
+}
+
+int setMessageQueueBlockingMode(MessageQueue* messageQueue, bool activate)
+{
+    messageQueue->attributes.mq_flags = (activate) ? 0 : O_NONBLOCK;
+
+    if (mq_setattr(messageQueue->mq_des, &messageQueue->attributes, NULL) == -1)
     {
-        perror("\n\rmq_receive failed !!!\n");
+        perror("\n\rmq_setattr failed !!!\n");
 
         switch(errno)
         {
-            case EAGAIN:
-                perror("The queue was empty, and the O_NONBLOCK flag was set for the message queue description referred to by mqdes.\n");
-                break;
             case EBADF:
-                perror("The descriptor specified in mqdes was invalid.\n");
-                break;
-            case EINTR:
-                perror("The call was interrupted by a signal handler.\n");
+                perror("The descriptor specified in mqdes is invalid.\n");
                 break;
             case EINVAL:
-                perror("The call would have blocked, and abs_timeout was invalid, either because tv_sec was less than zero, or because tv_nsec was less than zero or greater than 1000 million.\n");
-                break;
-            case EMSGSIZE:
-                perror("msg_len was less than the mq_msgsize attribute of the message queue.\n");
-                break;
-            case ETIMEDOUT:
-                perror("The call timed out before a message could be transferred.\n");
+                perror("newattr->mq_flags contained set bits other than O_NONBLOCK.\n");
                 break;
             default :
                 perror("Unknown error\n");
@@ -172,9 +201,7 @@ int receiveMessage(const MessageQueue* messageQueue,
         return -1;
     }
 
-    msg[msg_max_len -1] = '\0';
-
-    return (int)msg_len;
+    return 0;
 }
 
 int getMessageQueueNotificationBySignal(const MessageQueue* messageQueue,
