@@ -55,6 +55,13 @@ int closeSemaphore(Semaphore semaphore);
 int destroySemaphore(Semaphore semaphore);
 
 /**
+ * @brief destroySemaphore : close and destroy a named semaphore
+ * @param Semaphore : struct that contains all parameters for the semaphore
+ * @return : 0 if the semaphore is destroyed without error, otherwise -1
+ */
+int closeAndDestroySemaphore(Semaphore semaphore);
+
+/**
  * @brief waitSemaphore : decrements (locks) the semaphore
  * @param semaphore : struct that contains all parameters for the semaphore
  * @return : 0 if the semaphore is decreased without error, otherwise -1

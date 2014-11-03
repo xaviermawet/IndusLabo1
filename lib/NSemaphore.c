@@ -152,20 +152,25 @@ int closeSemaphore(Semaphore semaphore)
     return ret;
 }
 
+int closeAndDestroySemaphore(Semaphore semaphore)
+{
+    if (closeSemaphore(semaphore) == -1)
+        return -1;
+
+    if (destroySemaphore(semaphore) == -1)
+        return -1;
+
+    return 0;
+}
 
 int destroySemaphore(Semaphore semaphore)
 {
-    int ret;
-
-    if ((ret = closeSemaphore(semaphore)) == -1)
-        return ret;
-
     /* ---------------------------------------------------------------------- *
      * DESTRUCTION D'UN SEMAPHORE NOMME                                       *
      * NOM : semaphore.name[]                                                 *
      * ---------------------------------------------------------------------- */
 
-    if ((ret = sem_unlink(semaphore.name)) == -1)
+    if (sem_unlink(semaphore.name) == -1)
     {
         perror("\n\rsem_unlink failed !!!\n");
 
@@ -184,9 +189,11 @@ int destroySemaphore(Semaphore semaphore)
                 perror("Unknown error\n");
                 break;
         }
+
+        return -1;
     }
 
-    return ret;
+    return 0;
 }
 
 int waitSemaphore(Semaphore semaphore)
