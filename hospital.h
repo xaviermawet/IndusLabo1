@@ -20,6 +20,6 @@
  *                                  SEMAPHORE                                 *
  * -------------------------------------------------------------------------- */
 
-#define SEM_MUTEX_SHM_NAME "/tmp/sem_mutex_shm"
+#define SEM_MUTEX_SHM_NAME "/mutex_shm"
 
 #endif /* __HOSPITAL_H__ */
