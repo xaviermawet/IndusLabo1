@@ -206,17 +206,6 @@ int closeSharedMemory(SharedMemory sharedMemory)
     return 0;
 }
 
-int closeAndDestroySharedMemory(SharedMemory sharedMemory)
-{
-    if (closeSharedMemory(sharedMemory) == -1)
-        return -1;
-
-    if (destroySharedMemory(sharedMemory) == -1)
-        return -1;
-
-    return 0;
-}
-
 int destroySharedMemory(SharedMemory sharedMemory)
 {
     /* ---------------------------------------------------------------------- *
@@ -248,6 +237,17 @@ int destroySharedMemory(SharedMemory sharedMemory)
 
         return -1;
     }
+
+    return 0;
+}
+
+int closeAndDestroySharedMemory(SharedMemory sharedMemory)
+{
+    if (closeSharedMemory(sharedMemory) == -1)
+        return -1;
+
+    if (destroySharedMemory(sharedMemory) == -1)
+        return -1;
 
     return 0;
 }

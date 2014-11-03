@@ -152,17 +152,6 @@ int closeSemaphore(Semaphore semaphore)
     return ret;
 }
 
-int closeAndDestroySemaphore(Semaphore semaphore)
-{
-    if (closeSemaphore(semaphore) == -1)
-        return -1;
-
-    if (destroySemaphore(semaphore) == -1)
-        return -1;
-
-    return 0;
-}
-
 int destroySemaphore(Semaphore semaphore)
 {
     /* ---------------------------------------------------------------------- *
@@ -192,6 +181,17 @@ int destroySemaphore(Semaphore semaphore)
 
         return -1;
     }
+
+    return 0;
+}
+
+int closeAndDestroySemaphore(Semaphore semaphore)
+{
+    if (closeSemaphore(semaphore) == -1)
+        return -1;
+
+    if (destroySemaphore(semaphore) == -1)
+        return -1;
 
     return 0;
 }
