@@ -13,16 +13,33 @@
 
 void handler_sigint_exit(int sig, siginfo_t* siginfo_handler, int* val);
 
+void DisplayMenu(void);
+void generatePatients(void);
+
+int c;
+
+pid_t pid_tri;
+
 int main(void)
 {
+    Semaphore mutex_shm;
     SharedMemory shm;
-    pid_t pid_tri;
+
+    srand(time(NULL));
 
     // Free resources
     setSignalHandler(SIGINT, handler_sigint_exit);
 
     /* ---------------------------------------------------------------------- *
-     *                          CREATE SHARED MEMORY                          *
+     *                         OPEN SEMAPHORE (MUTEX)                         *
+     * ---------------------------------------------------------------------- */
+    if (openSemaphore(&mutex_shm, SEM_MUTEX_SHM_NAME) == 1)
+        exit(EXIT_FAILURE);
+
+    GREENPRINTF("Mutex opened\n");
+
+    /* ---------------------------------------------------------------------- *
+     *                           OPEN SHARED MEMORY                           *
      * ---------------------------------------------------------------------- */
     if(openSharedMemory(&shm, SHM_NAME, SHM_NB_RECORDS * sizeof(pid_t)) == -1)
         exit(EXIT_FAILURE);
@@ -30,10 +47,13 @@ int main(void)
     GREENPRINTF("Shared memory opened\n");
 
     /* ---------------------------------------------------------------------- *
-     *                          READ IN SHARED MEMORY                         *
+     *                        READ PID IN SHARED MEMORY                       *
      * ---------------------------------------------------------------------- */
     readSharedMemory(&shm, &pid_tri, sizeof(pid_t), 0);
-    printf("PID tri : %d\n", pid_tri);
+
+    waitSemaphore(mutex_shm);
+    printf("PID process Tri : %d\n", pid_tri);
+    signalSemaphore(mutex_shm);
 
     /* ---------------------------------------------------------------------- *
      *                           CLOSE SHARED MEMORY                          *
@@ -43,79 +63,19 @@ int main(void)
 
     GREENPRINTF("Shared memory closed\n");
 
+    /* ---------------------------------------------------------------------- *
+     *                         CLOSE SEMAPHORE (MUTEX)                        *
+     * ---------------------------------------------------------------------- */
+    if (closeSemaphore(mutex_shm) == -1)
+        exit(EXIT_FAILURE);
+
+    GREENPRINTF("Mutex closed\n");
+
+
+
     // Loop for receiving signals
     while(1)
-        pause();
-
-//    char buff[250];
-//    MessageQueue mq;
-
-//    printf("Création d'une message queue ...\n");
-
-//    if (createMessageQueue(&mq, "/mqlinuxpedia", 10, 100) == -1)
-//    {
-//        printf("La message queue existe déjà --> ouverture...\n");
-//        openMessageQueue(&mq, "/mqlinuxpedia");
-//        printf("Message queue ouverte !\n");
-//    }
-//    else
-//        printf("Message queue créée !\n");
-
-//    printf("Envoi du message : Hello World\n");
-
-//    if (sendMessage(&mq, "Hello World", 42) != -1)
-//        printf("Message envoyé...\n");
-
-//    sleep(2);
-
-//    printf("Lecture du message ...\n");
-
-//    receiveMessage(&mq, buff, 250, NULL);
-
-//    printf("Message lu : %s\n", buff);
-
-//    printf("Destruction...\n");
-
-//    destroyMessageQueue(&mq);
-
-//    printf("Message queue détruite !!!\n");
-
-
-
-//    int i;
-//    union sigval value;
-
-//    printf("PID : %d\n", getpid());
-
-//    srand(time(NULL));
-//    for(i = 0; i < 10; ++i)
-//        printf("Random Number : %d\n", getRandomNumber(0, 100));
-
-//    printf("Armement du signal SIGINT\n");
-
-//    setSignalHandler(SIGINT, handler_sigint);
-
-//    sleep(10);
-
-//    printf("Bloquage du signal SIGINT\n");
-//    blockSignal(SIGINT);
-
-//    sleep(5);
-
-//    printf("Débloquage du signal SIGINT\n");
-//    unblockSignal(SIGINT);
-
-//    printf("Auto-envoi du signal SIGINT dans 2 sec ...\n");
-//    sleep(2);
-
-//    value.sival_int = 0;
-//    sendQueuedSignal(SIGINT, getpid(), value);
-
-//    // Loop for receiving signals
-//    while(1)
-//    {
-//        pause();
-//    }
+        DisplayMenu();
 
     return EXIT_SUCCESS;
 }
@@ -126,6 +86,66 @@ void handler_sigint_exit(int sig, siginfo_t* siginfo_handler, int* val)
     UNUSED(siginfo_handler);
     UNUSED(val);
 
-    puts("Fermeture du programme...");
+    GREENPRINTF("\nFree resources and close ...\n");
     exit(EXIT_SUCCESS);
+}
+
+void DisplayMenu(void)
+{
+    printf("=========================================\n");
+    printf("|                ACCUEIL                |\n");
+    printf("=========================================\n");
+    printf("1. Generate random patients\n");
+    printf("2. Enter patient\n");
+    printf("Use CTRL + C to quit\n");
+
+    printf("Your choice : ");
+
+    switch (getNumber())
+    {
+        case 1:
+            generatePatients();
+            break;
+        case 2:
+            printf("Enter ...\n");
+        default:
+            break;
+    }
+
+    getchar();
+
+    CLS
+}
+
+void generatePatients(void)
+{
+    int i;
+    int num_patients;
+    int* patients = NULL;
+    union sigval value;
+
+    printf("How many patients : ");
+    do
+    {
+        num_patients = getNumber();
+    } while(num_patients < 0);
+
+    patients = (int*)malloc(num_patients * sizeof(int));
+
+    for(i = 0; i < num_patients; i++)
+    {
+        patients[i] = getRandomNumber(1, 10000);
+        printf("SIS patient %d : %d\n", i, patients[i]);
+    }
+
+    printf("Press ENTER to send all patients to the process Tri...");
+    getchar();
+
+    for(i = 0; i < num_patients; i++)
+    {
+        value.sival_int = patients[i];
+        sendQueuedSignal(SIGUSR1, pid_tri, value);
+    }
+
+    free(patients);
 }

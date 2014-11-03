@@ -44,7 +44,15 @@ int main(void)
 
     // Loop for receiving signals
     while(1)
+    {
+        printf("loop...\n");
         pause();
+
+        GREENPRINTF("Nouvel abonnement au signal ...\n");
+        setSignalHandler(SIGUSR1, handler_sigusr1_readMessage);
+
+        FREE_BUFF
+    }
 }
 
 void handler_sigint_exit(int sig, siginfo_t* siginfo_handler, int* val)
@@ -56,10 +64,10 @@ void handler_sigint_exit(int sig, siginfo_t* siginfo_handler, int* val)
     /* ---------------------------------------------------------------------- *
      *                          DESTROY MESSAGE QUEUE                         *
      * ---------------------------------------------------------------------- */
-    if (destroyMessageQueue(&mq_traitement) == -1)
-        REDPRINTF("Message queue destroy failed\n");
+    if (closeAndDestroyMessageQueue(&mq_traitement) == -1)
+        REDPRINTF("\nMessage queue destroy failed\n");
     else
-        GREENPRINTF("Message queue destroyed\n");
+        GREENPRINTF("\nMessage queue closed and destroyed\n");
 
     exit(EXIT_SUCCESS);
 }
