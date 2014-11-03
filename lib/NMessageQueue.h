@@ -29,9 +29,11 @@ int createMessageQueue(MessageQueue* messageQueue,
 int openMessageQueue(MessageQueue* messageQueue,
                      const char* name);
 
-int closeMessageQueue(const MessageQueue* messageQueue);
+int closeMessageQueue(MessageQueue* messageQueue);
 
-int destroyMessageQueue(const MessageQueue* messageQueue);
+int destroyMessageQueue(MessageQueue* messageQueue);
+
+int closeAndDestroyMessageQueue(MessageQueue* messageQueue);
 
 int sendMessage(const MessageQueue* messageQueue,
                 const char* message,

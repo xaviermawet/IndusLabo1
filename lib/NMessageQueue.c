@@ -25,7 +25,7 @@ int openMessageQueue(MessageQueue* messageQueue,
     return privateOpenMessageQueue(messageQueue, (O_RDWR));
 }
 
-int closeMessageQueue(const MessageQueue* messageQueue)
+int closeMessageQueue(MessageQueue* messageQueue)
 {
     if (mq_close(messageQueue->mq_des) == -1)
     {
@@ -44,14 +44,14 @@ int closeMessageQueue(const MessageQueue* messageQueue)
         return -1;
     }
 
+    // Erase previous message queue file descriptor
+    messageQueue->mq_des = -1;
+
     return 0;
 }
 
-int destroyMessageQueue(const MessageQueue* messageQueue)
+int destroyMessageQueue(MessageQueue* messageQueue)
 {
-    if (closeMessageQueue(messageQueue) == -1)
-        return -1;
-
     if (mq_unlink(messageQueue->name) == -1)
     {
         perror("\n\rmq_unlink failed !!!\n");
@@ -74,6 +74,20 @@ int destroyMessageQueue(const MessageQueue* messageQueue)
 
         return -1;
     }
+
+    // Erase previous message queue name
+    memset(&messageQueue->name[0], 0, MQ_NAME_LENGTH);
+
+    return 0;
+}
+
+int closeAndDestroyMessageQueue(MessageQueue* messageQueue)
+{
+    if (closeMessageQueue(messageQueue) == -1)
+        return -1;
+
+    if (destroyMessageQueue(messageQueue) == -1)
+        return -1;
 
     return 0;
 }
