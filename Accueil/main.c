@@ -14,7 +14,8 @@
 void handler_sigint_exit(int sig, siginfo_t* siginfo_handler, int* val);
 
 void DisplayMenu(void);
-void generatePatients(void);
+void generateSISNumbers(void);
+void encodeSISNumbers(void);
 
 int c;
 
@@ -95,8 +96,8 @@ void DisplayMenu(void)
     printf("=========================================\n");
     printf("|                ACCUEIL                |\n");
     printf("=========================================\n");
-    printf("1. Generate random patients\n");
-    printf("2. Enter patient\n");
+    printf("1. Generate random SIS numbers\n");
+    printf("2. Encode SIS numbers\n");
     printf("Use CTRL + C to quit\n");
 
     printf("Your choice : ");
@@ -104,24 +105,25 @@ void DisplayMenu(void)
     switch (getNumber())
     {
         case 1:
-            generatePatients();
+            generateSISNumbers();
             break;
         case 2:
-            printf("Enter ...\n");
+            encodeSISNumbers();
         default:
             break;
     }
 
+    printf("Press ENTER to display menu");
     getchar();
 
     CLS
 }
 
-void generatePatients(void)
+void generateSISNumbers(void)
 {
     int i;
     int num_patients;
-    int* patients = NULL;
+    int* SISNumbers = NULL;
     union sigval value;
 
     printf("How many patients : ");
@@ -130,22 +132,55 @@ void generatePatients(void)
         num_patients = getNumber();
     } while(num_patients < 0);
 
-    patients = (int*)malloc(num_patients * sizeof(int));
+    SISNumbers = (int*)malloc(num_patients * sizeof(int));
 
     for(i = 0; i < num_patients; i++)
     {
-        patients[i] = getRandomNumber(1, 10000);
-        printf("SIS patient %d : %d\n", i, patients[i]);
+        SISNumbers[i] = getRandomNumber(1, 10000);
+        printf("Patient %d : SIS numbers %d\n", i, SISNumbers[i]);
     }
 
-    printf("Press ENTER to send all patients to the process Tri...");
+    printf("Press ENTER to send all SIS numbers (patients) to the process Tri");
     getchar();
 
     for(i = 0; i < num_patients; i++)
     {
-        value.sival_int = patients[i];
+        value.sival_int = SISNumbers[i];
         sendQueuedSignal(SIGUSR1, pid_tri, value);
     }
 
-    free(patients);
+    free(SISNumbers);
+}
+
+void encodeSISNumbers(void)
+{
+    int i;
+    int num_patients;
+    int* SISNumbers = NULL;
+    union sigval value;
+
+    printf("How many patients : ");
+    do
+    {
+        num_patients = getNumber();
+    } while(num_patients < 0);
+
+    SISNumbers = (int*)malloc(num_patients * sizeof(int));
+
+    for(i = 0; i < num_patients; i++)
+    {
+        printf("Patient %d : SIS numbers : ", i);
+        SISNumbers[i] = getNumber();
+    }
+
+    printf("Press ENTER to send all SIS numbers (patients) to the process Tri");
+    getchar();
+
+    for(i = 0; i < num_patients; i++)
+    {
+        value.sival_int = SISNumbers[i];
+        sendQueuedSignal(SIGUSR1, pid_tri, value);
+    }
+
+    free(SISNumbers);
 }
