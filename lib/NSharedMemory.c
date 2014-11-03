@@ -206,11 +206,19 @@ int closeSharedMemory(SharedMemory sharedMemory)
     return 0;
 }
 
-int destroySharedMemory(SharedMemory sharedMemory)
+int closeAndDestroySharedMemory(SharedMemory sharedMemory)
 {
     if (closeSharedMemory(sharedMemory) == -1)
         return -1;
 
+    if (destroySharedMemory(sharedMemory) == -1)
+        return -1;
+
+    return 0;
+}
+
+int destroySharedMemory(SharedMemory sharedMemory)
+{
     /* ---------------------------------------------------------------------- *
      * EFFACEMENT DE L'OBJET MEMOIRE PARTAGEE                                 *
      * NOM : sharedMemory.name.

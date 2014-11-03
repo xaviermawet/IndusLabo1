@@ -43,6 +43,8 @@ int closeSharedMemory(SharedMemory sharedMemory);
 
 int destroySharedMemory(SharedMemory sharedMemory);
 
+int closeAndDestroySharedMemory(SharedMemory sharedMemory);
+
 /* -------------------------------------------------------------------------- *
  *                             PRIVATE FONCTIONS                              *
  * -------------------------------------------------------------------------- */
