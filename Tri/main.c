@@ -18,6 +18,16 @@ Semaphore    mutex_shm;
 SharedMemory shm;
 MessageQueue mq_traitement;
 
+
+char message[MQ_MAX_MESSAGE_LENGTH];
+char *diagnosis[] = {"Nasty cough",
+                     "Hallucination",
+                     "Broken leg",
+                     "Loss of consciousness",
+                     "Breathing problem ",
+                     "Pericardite",
+                     "Mad cow disease"};
+
 int main(void)
 {
     pid_t pid_tri;
@@ -123,18 +133,27 @@ void handler_sigint_exit(int sig, siginfo_t* siginfo_handler, int* val)
 
 void handler_sigusr1_managePatient(int sig, siginfo_t* siginfo_handler, int* val)
 {
+    int SISNumber;
+    int priority;
+
     UNUSED(sig);
     UNUSED(val);
 
-    printf("Patient recu, SIS = %d\n", siginfo_handler->si_value.sival_int);
+    SISNumber = siginfo_handler->si_value.sival_int;
+    priority = getRandomNumber(0, 6);
+
+    sprintf(message, "Patient SIS = %d : %s", SISNumber, diagnosis[priority]);
+    printf("%s - Priority %d\n", message, priority);
+
+    // NOTE : Mettre un temps de pause pour le temps de traitement :o ?
 
     /* ---------------------------------------------------------------------- *
      *                              SEND MESSAGE                              *
      * ---------------------------------------------------------------------- */
 
-//    if (sendMessage(&mq_traitement, "Hello Wordl", 1) == -1)
-//        exit(EXIT_FAILURE);
+    if (sendMessage(&mq_traitement, message, priority) == -1)
+        exit(EXIT_FAILURE);
 
-//    GREENPRINTF("Message sent !\n");
+    GREENPRINTF("Message sent !\n");
 }
 

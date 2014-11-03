@@ -15,6 +15,8 @@ void handler_sigusr1_readMessage(int sig, siginfo_t* siginfo_handler, int* val);
 MessageQueue mq_traitement;
 int c;
 
+char message[MQ_MAX_MESSAGE_LENGTH];
+
 int main(void)
 {
     // Free resources
@@ -45,13 +47,10 @@ int main(void)
     // Loop for receiving signals
     while(1)
     {
-        printf("loop...\n");
         pause();
 
         GREENPRINTF("Nouvel abonnement au signal ...\n");
         setSignalHandler(SIGUSR1, handler_sigusr1_readMessage);
-
-        FREE_BUFF
     }
 }
 
@@ -74,12 +73,25 @@ void handler_sigint_exit(int sig, siginfo_t* siginfo_handler, int* val)
 
 void handler_sigusr1_readMessage(int sig, siginfo_t* siginfo_handler, int* val)
 {
+    unsigned int priority;
+
     UNUSED(sig);
     UNUSED(siginfo_handler);
     UNUSED(val);
 
-    GREENPRINTF("Lire message ...\n");
-    FREE_BUFF
+    // Read current message
+    if (receiveMessage(&mq_traitement, message, MQ_MAX_MESSAGE_LENGTH, &priority) == -1)
+        REDPRINTF("Error when receiving message ...\n");
+
+    printf("Message received with priority %d : %s\n", priority, message);
+
+
+    // TODO : mettre la fille de message en non bloquant
+    // TODO : la vider tant qu'il y a des messages
+    // TODO : remettre la file en bloquant
+    // TODO : faire une nouvelle demande de notification
+
+    // TODO : vider le char[] message comme dans la lib pour vider le nom de je ne sais plus quoi ^^
 }
 
 
