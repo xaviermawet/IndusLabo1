@@ -49,11 +49,11 @@ int main(void)
     /* ---------------------------------------------------------------------- *
      *                        READ PID IN SHARED MEMORY                       *
      * ---------------------------------------------------------------------- */
-    readSharedMemory(&shm, &pid_tri, sizeof(pid_t), 0);
-
     waitSemaphore(mutex_shm);
-    printf("PID process Tri : %d\n", pid_tri);
+    readSharedMemory(&shm, &pid_tri, sizeof(pid_t), 0);
     signalSemaphore(mutex_shm);
+
+    printf("PID process Tri : %d\n", pid_tri);
 
     /* ---------------------------------------------------------------------- *
      *                           CLOSE SHARED MEMORY                          *
