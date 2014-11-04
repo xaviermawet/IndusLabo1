@@ -74,8 +74,6 @@ int main(void)
     // Loop for receiving signals
     while(1)
         DisplayMenu();
-
-    return EXIT_SUCCESS;
 }
 
 void handler_sigint_exit(int sig, siginfo_t* siginfo_handler, int* val)
